@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+semver,com.github.jinahya.semver,Version,126,0,12,0,27,0,12,0,6,0
+semver,com.github.jinahya.semver,Release.Builder,89,0,12,0,19,0,10,0,4,0
+semver,com.github.jinahya.semver,Version.Builder,150,0,6,0,44,0,25,0,22,0
+semver,com.github.jinahya.semver,Release,117,0,10,0,21,0,12,0,7,0
+semver,com.github.jinahya.semver,Metadata.Builder,89,0,12,0,19,0,10,0,4,0
+semver,com.github.jinahya.semver,Metadata,117,0,10,0,21,0,12,0,7,0
