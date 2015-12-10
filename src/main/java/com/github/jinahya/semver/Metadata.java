@@ -17,12 +17,10 @@
 package com.github.jinahya.semver;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.validation.constraints.NotNull;
 
 
 /**
@@ -32,7 +30,7 @@ import javax.validation.constraints.NotNull;
 public class Metadata {
 
 
-    protected static final String IDENTIFIER_REGEXP = "[0-9A-Za-z-]+";
+    private static final String IDENTIFIER_REGEXP = "[0-9A-Za-z-]+";
 
 
     private static final Pattern IDENTIFIER_PATTERN
@@ -72,14 +70,6 @@ public class Metadata {
     public static class Builder {
 
 
-        public Builder value(final String value) {
-
-            this.value = requireValidValue(value);
-
-            return this;
-        }
-
-
         public Builder identifiers(final String identifier,
                                    final String... otherIdentifiers) {
 
@@ -87,15 +77,14 @@ public class Metadata {
                 throw new NullPointerException("null identifiers");
             }
 
-            identifiers.add(requireValidIdentifier(identifier));
+            getIdentifiers().add(requireValidIdentifier(identifier));
 
             if (otherIdentifiers != null) {
                 for (final String otherIdentifier : otherIdentifiers) {
-                    identifiers.add(requireValidIdentifier(otherIdentifier));
+                    getIdentifiers().add(
+                        requireValidIdentifier(otherIdentifier));
                 }
             }
-
-            value = null;
 
             return this;
         }
@@ -103,32 +92,31 @@ public class Metadata {
 
         public Metadata build() {
 
-            return new Metadata(value());
-        }
-
-
-        private String value() {
-
-            if (value != null) {
-                return null;
-            }
-
             final StringBuilder builder = new StringBuilder();
-            final Iterator<String> i = identifiers.iterator();
+
+            final Iterator<String> i = getIdentifiers().iterator();
             if (i.hasNext()) {
                 builder.append(i.next());
             }
             while (i.hasNext()) {
                 builder.append('.').append(i.next());
             }
-            return builder.toString();
+
+            return new Metadata(builder.toString());
         }
 
 
-        private String value;
+        public List<String> getIdentifiers() {
+
+            if (identifiers == null) {
+                identifiers = new ArrayList<String>();
+            }
+
+            return identifiers;
+        }
 
 
-        private final List<String> identifiers = new ArrayList<String>();
+        private List<String> identifiers;
 
     }
 
@@ -162,38 +150,12 @@ public class Metadata {
     }
 
 
-    public <T extends Appendable> T append(final T appendable)
-        throws IOException {
-
-        if (appendable == null) {
-            throw new NullPointerException("null appendable");
-        }
-
-        if (!value.isEmpty()) {
-            appendable.append('+').append(value);
-        }
-
-        return appendable;
-    }
-
-
-    public StringBuilder append(final StringBuilder builder) {
-
-        try {
-            return (StringBuilder) append((Appendable) builder);
-        } catch (final IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
-    }
-
-
     public String getValue() {
 
         return value;
     }
 
 
-    @NotNull
     private final String value;
 
 }

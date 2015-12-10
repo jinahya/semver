@@ -17,11 +17,8 @@
 package com.github.jinahya.semver;
 
 
-import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 
 /**
@@ -31,22 +28,6 @@ import javax.validation.constraints.Min;
 public class Version {
 
 
-    private static final String NORMAL_IDENTIFIER_REGEXP = "0|[1-9][0-9]*?";
-
-
-////    public static final String REGEXP
-////        = "(" + NORMAL_IDENTIFIER_REGEXP + ")" + "\\."
-////          + "(" + NORMAL_IDENTIFIER_REGEXP + ")" + "\\."
-////          + "(" + NORMAL_IDENTIFIER_REGEXP + ")"
-////          + "(-" + "(" + Release.REGEXP + "))??"
-////          + "(\\+" + "(" + Metadata.REGEXP + "))??";
-//    public static final String REGEXP
-//        = "(" + NORMAL_IDENTIFIER_REGEXP + ")" + "\\."
-//          + "(" + NORMAL_IDENTIFIER_REGEXP + ")" + "\\."
-//          + "(" + NORMAL_IDENTIFIER_REGEXP + ")"
-//          + "(-" + "(" + Release.REGEXP + "))??"
-//          + "(\\+" + "(" + "(" + Metadata.IDENTIFIER_REGEXP + ")(\\.(" + Metadata.IDENTIFIER_REGEXP + "))*" + "))??";
-//    public static final Pattern PATTERN = Pattern.compile(REGEXP);
     private static final String REGEXP
         = "(\\d+)\\.(\\d+)\\.(\\d+)(-([^\\+]*))?(\\+(.+))?";
 
@@ -87,58 +68,96 @@ public class Version {
                 .append(String.valueOf(patch));
 
             if (release != null) {
-                release.append(builder);
+                builder.append('-').append(release.getValue());
             }
 
             if (metadata != null) {
-                metadata.append(builder);
+                builder.append('+').append(metadata.getValue());
             }
-
-            System.out.println("toString: " + builder.toString());
 
             return builder.toString();
         }
 
 
-        public Builder major(final int major) {
+        public int getMajor() {
+
+            return major;
+        }
+
+
+        public void setMajor(final int major) {
 
             if (major < 0) {
                 throw new IllegalArgumentException("major(" + major + ") < 0");
             }
 
             this.major = major;
+        }
+
+
+        public Builder major(final int major) {
+
+            setMajor(major);
 
             return this;
+        }
+
+
+        public int getMinor() {
+
+            return minor;
+        }
+
+
+        public void setMinor(final int minor) {
+
+            this.minor = minor;
         }
 
 
         public Builder minor(final int minor) {
 
-            if (minor < 0) {
-                throw new IllegalArgumentException("minor(" + minor + ") < 0");
-            }
-
-            this.minor = minor;
+            setMinor(minor);
 
             return this;
+        }
+
+
+        public int getPatch() {
+
+            return patch;
+        }
+
+
+        public void setPatch(final int patch) {
+
+            this.patch = patch;
         }
 
 
         public Builder patch(final int patch) {
 
-            if (patch < 0) {
-                throw new IllegalArgumentException("patch(" + patch + ") < 0");
-            }
-
-            this.patch = patch;
+            setPatch(patch);
 
             return this;
         }
 
 
-        public Builder release(final Release release) {
+        public Release getRelease() {
+
+            return release;
+        }
+
+
+        public void setRelease(final Release release) {
 
             this.release = release;
+        }
+
+
+        public Builder release(final Release release) {
+
+            setRelease(release);
 
             return this;
         }
@@ -156,9 +175,21 @@ public class Version {
         }
 
 
-        public Builder metadata(final Metadata metadata) {
+        public Metadata getMetadata() {
+
+            return metadata;
+        }
+
+
+        public void setMetadata(final Metadata metadata) {
 
             this.metadata = metadata;
+        }
+
+
+        public Builder metadata(final Metadata metadata) {
+
+            setMetadata(metadata);
 
             return this;
         }
@@ -176,23 +207,18 @@ public class Version {
         }
 
 
-        @Min(0)
         private int major;
 
 
-        @Min(0)
         private int minor;
 
 
-        @Min(0)
         private int patch;
 
 
-        @Valid
         private Release release;
 
 
-        @Valid
         private Metadata metadata;
 
     }
@@ -215,13 +241,11 @@ public class Version {
             .patch(Integer.parseInt(matcher.group(3)));
 
         final String releaseValue = matcher.group(5);
-        System.out.println("rv: " + releaseValue);
         if (releaseValue != null) {
             builder.release(Release.valueOf(releaseValue));
         }
 
         final String metadataValue = matcher.group(7);
-        System.out.println("mv: " + metadataValue);
         if (metadataValue != null) {
             builder.metadata(Metadata.valueOf(metadataValue));
         }
@@ -238,31 +262,10 @@ public class Version {
     }
 
 
-    public <T extends Appendable> T append(final T appendable)
-        throws IOException {
-
-        if (appendable == null) {
-            throw new NullPointerException("null appendable");
-        }
-
-        return (T) appendable.append(value);
-    }
-
-
-    public StringBuilder append(final StringBuilder builder) {
-
-        try {
-            return (StringBuilder) append((Appendable) builder);
-        } catch (final IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
-    }
-
-
     @Override
     public String toString() {
 
-        return append(new StringBuilder()).toString();
+        return super.toString() + "{" + "value=" + value + "}";
     }
 
 

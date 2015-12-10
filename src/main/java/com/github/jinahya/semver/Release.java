@@ -17,13 +17,10 @@
 package com.github.jinahya.semver;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlValue;
 
 
 /**
@@ -73,14 +70,6 @@ public class Release {
     public static class Builder {
 
 
-        public Builder value(final String value) {
-
-            this.value = requireValidValue(value);
-
-            return this;
-        }
-
-
         public Builder identifiers(final String identifier,
                                    final String... otherIdentifiers) {
 
@@ -88,15 +77,14 @@ public class Release {
                 throw new NullPointerException("null identifier");
             }
 
-            identifiers.add(requireValidIdentifier(identifier));
+            getIdentifiers().add(requireValidIdentifier(identifier));
 
             if (otherIdentifiers != null) {
                 for (final String otherIdentifier : otherIdentifiers) {
-                    identifiers.add(requireValidIdentifier(otherIdentifier));
+                    getIdentifiers().add(
+                        requireValidIdentifier(otherIdentifier));
                 }
             }
-
-            value = null;
 
             return this;
         }
@@ -104,19 +92,9 @@ public class Release {
 
         public Release build() {
 
-            return new Release(value());
-        }
-
-
-        private String value() {
-
-            if (value != null) {
-                return value.toString();
-            }
-
             final StringBuilder builder = new StringBuilder();
 
-            final Iterator<String> i = identifiers.iterator();
+            final Iterator<String> i = getIdentifiers().iterator();
             if (i.hasNext()) {
                 builder.append(i.next());
             }
@@ -124,14 +102,21 @@ public class Release {
                 builder.append('.').append(i.next());
             }
 
-            return builder.toString();
+            return new Release(builder.toString());
         }
 
 
-        private CharSequence value;
+        public List<String> getIdentifiers() {
+
+            if (identifiers == null) {
+                identifiers = new ArrayList<String>();
+            }
+
+            return identifiers;
+        }
 
 
-        private final List<String> identifiers = new ArrayList<String>();
+        private List<String> identifiers;
 
     }
 
@@ -159,34 +144,7 @@ public class Release {
     @Override
     public String toString() {
 
-        return super.toString() + "{"
-               + "value=" + value
-               + "}";
-    }
-
-
-    public <T extends Appendable> T append(final T appendable)
-        throws IOException {
-
-        if (appendable == null) {
-            throw new NullPointerException("null appendable");
-        }
-
-        if (!value.isEmpty()) {
-            appendable.append('-').append(value);
-        }
-
-        return appendable;
-    }
-
-
-    public StringBuilder append(final StringBuilder builder) {
-
-        try {
-            return (StringBuilder) append((Appendable) builder);
-        } catch (final IOException ioe) {
-            throw new RuntimeException(ioe);
-        }
+        return super.toString() + "{" + "value=" + value + "}";
     }
 
 
@@ -196,8 +154,6 @@ public class Release {
     }
 
 
-    @NotNull
-    @XmlValue
     private final String value;
 
 }
