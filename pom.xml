@@ -31,8 +31,6 @@
     <system>GitHub Issues</system>
     <url>https://github.com/jinahya/${project.artifactId}/issues</url>
   </issueManagement>
-
-
   <distributionManagement>
     <site>
       <id>github</id>
