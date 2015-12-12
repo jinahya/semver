@@ -10,29 +10,23 @@
 
   <groupId>com.github.jinahya</groupId>
   <artifactId>semver</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>
   <description>library for semver.org</description>
   <url>https://github.com/jinahya/${project.version}</url>
 
-  <prerequisites>
-    <maven>3.3.9</maven>
-  </prerequisites>
-
   <scm>
     <connection>scm:git:git@github.com:jinahya/${project.artifactId}.git</connection>
     <developerConnection>scm:git:git@github.com:jinahya/${project.artifactId}.git</developerConnection>
     <url>https://github.com/jinahya/${project.artifactId}</url>
-    <tag>0.1.0</tag>
+    <tag>0.2.0</tag>
   </scm>
   <issueManagement>
     <system>GitHub Issues</system>
     <url>https://github.com/jinahya/${project.artifactId}/issues</url>
   </issueManagement>
-
-
   <distributionManagement>
     <site>
       <id>github</id>
@@ -100,6 +94,10 @@
               <goal>check</goal>
             </goals>
             <configuration>
+              <ignores>
+                <ignore>java.util.function.IntUnaryOperator</ignore>
+                <ignore>java.util.function.UnaryOperator</ignore>
+              </ignores>
               <signature>
                 <groupId>org.codehaus.mojo.signature</groupId>
                 <artifactId>java16</artifactId>
@@ -114,6 +112,10 @@
               <goal>check</goal>
             </goals>
             <configuration>
+              <ignores>
+                <ignore>java.util.function.IntUnaryOperator</ignore>
+                <ignore>java.util.function.UnaryOperator</ignore>
+              </ignores>
               <signature>
                 <groupId>net.sf.androidscents.signature</groupId>
                 <artifactId>android-api-level-16</artifactId>

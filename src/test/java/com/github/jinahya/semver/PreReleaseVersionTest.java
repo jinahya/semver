@@ -29,30 +29,24 @@ import org.testng.annotations.Test;
  *
  * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
  */
-public class VersionTest {
+public class PreReleaseVersionTest {
 
 
     private static final Logger logger
-        = LoggerFactory.getLogger(VersionTest.class);
+        = LoggerFactory.getLogger(PreReleaseVersionTest.class);
 
 
-    private static List<String> VALIDS = Arrays.asList(
-        "1.9.0", "1.10.0",
-        "1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-0.3.7", "1.0.0-x.7.z.92",
-        "1.0.0-alpha+001", "1.0.0+20130313144700", "1.0.0-beta+exp.sha.5114f85",
-        "1.0.0", "2.0.0", "2.1.1",
-        "1.0.0-alpha",
-        "1.0.0-alpha", "1.0.0-alpha.1", "1.0.0-alpha.beta",
-        "1.0.0-beta", "1.0.0-beta.2", "1.0.0-beta.11", "1.0.0-rc.1");
+    private static final List<String> VALIDS
+        = Arrays.asList("alpha", "alpha.1", "0.3.7", "x.7.z.92");
 
 
     @Test
-    public static void valueOf() {
+    public void valueOf() {
 
-        for (final String expected : VALIDS) {
-            final String actual = Version.valueOf(expected).build().getValue();
+        VALIDS.forEach(expected -> {
+            final String actual = PreReleaseVersion.valueOf(expected).toString();
             assertEquals(actual, expected);
-        }
+        });
     }
 
 }
