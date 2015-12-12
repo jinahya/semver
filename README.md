@@ -34,11 +34,9 @@ final NormalVersion.Builder builder = new NormalVersion.Builder()
     .minorVersion(1)
     .patchVersion(0)
     .preReleaseVersion(
-        new PreReleaseVersion.Builder()
-        .identifiers("x", "7", "z", "92"))
+        new PreReleaseVersion.Builder().identifiers("x", "7.z.92"))
     .buildMetadata(
-        new BuildMetadata.Builder()
-        .identifiers("exp", "sha", "5114f85"));
+        new BuildMetadata.Builder().identifiers("exp.sha", "5114f85"));
 final NormalVersion built = builder.build();
 assertEquals(built.toString(), "0.1.0-x.7.z.92+exp.sha.5114f85");
 ```
