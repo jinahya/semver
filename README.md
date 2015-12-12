@@ -38,6 +38,7 @@ final NormalVersion built = builder.build();
 assertEquals(built.toString(), "0.1.0-x.7.z.92+exp.sha.5114f85");
 ```
 > Patch version MUST be reset to 0 when minor version is incremented.
+
 ```java
 final NormalVersion.Builder builder = new NormalVersion.Builder()
     .majorVersion(0)
@@ -48,6 +49,7 @@ assertEquals(builder.build().toString(), "0.1.2");
 assertEquals(built.getMajorVersionIncreased().toString(), "1.0.0");
 ```
 > Patch and minor version MUST be reset to 0 when major version is incremented.
+
 ```java
 final NormalVersion.Builder builder = new NormalVersion.Builder()
     .majorVersion(0)
