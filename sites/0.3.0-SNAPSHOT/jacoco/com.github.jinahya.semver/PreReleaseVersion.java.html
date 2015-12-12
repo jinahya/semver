@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>PreReleaseVersion.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">semver</a> &gt; <a href="index.source.html" class="el_package">com.github.jinahya.semver</a> &gt; <span class="el_source">PreReleaseVersion.java</span></div><h1>PreReleaseVersion.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015 Jin Kwon &amp;lt;jinahya_at_gmail.com&amp;gt;.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.jinahya.semver;
+
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
+
+
+/**
+ * Represents {@code Pre-release version} part of {@code Semantic Versioning}.
+ *
+ * @author Jin Kwon &amp;lt;jinahya_at_gmail.com&amp;gt;
+ */
+public class PreReleaseVersion implements Comparable&lt;PreReleaseVersion&gt; {
+
+
+    private static final String IDENTIFIER_REGEXP
+        = &quot;0|([1-9A-Za-z-][0-9A-Za-z-]*)&quot;;
+
+
+    /**
+     * A pre-compiled pattern for identifiers.
+     */
+<span class="nc" id="L43">    public static final Pattern IDENTIFIER_PATTERN</span>
+<span class="nc" id="L44">        = Pattern.compile(IDENTIFIER_REGEXP);</span>
+
+
+    /**
+     * Checks if given identifier is valid.
+     *
+     * @param &lt;T&gt; identifier parameter type
+     * @param identifier the identifier to check
+     *
+     * @return the identifier if valid
+     *
+     * @throws NullPointerException if {@code identifier} is {@code null}
+     * @throws IllegalArgumentException if {@code identifier} is not valid.
+     *
+     * @see #IDENTIFIER_PATTERN
+     */
+    public static &lt;T extends CharSequence&gt; T requireValidIdentifier(
+        final T identifier) {
+
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (!IDENTIFIER_PATTERN.matcher(identifier).matches()) {</span>
+<span class="nc" id="L64">            throw new IllegalArgumentException(</span>
+                &quot;invalid identifier: &quot; + identifier);
+        }
+
+<span class="nc" id="L68">        return identifier;</span>
+    }
+
+
+    /**
+     * Class for building {@link PreReleaseVersion}s.
+     */
+<span class="nc" id="L75">    public static class Builder {</span>
+
+
+        /**
+         * Creates a new instance by parsing specified string.
+         *
+         * @param s the string to parse
+         *
+         * @return a new instance of {@code Builder}
+         *
+         * @see PreReleaseVersion#requireValidIdentifier(java.lang.CharSequence)
+         */
+        public static Builder valueOf(final String s) {
+
+<span class="nc" id="L89">            final Builder builder = new Builder();</span>
+
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            for (final String identifier : s.split(&quot;\\.&quot;)) {</span>
+<span class="nc" id="L92">                builder.identifiers(identifier);</span>
+            }
+
+<span class="nc" id="L95">            return builder;</span>
+        }
+
+
+        public static Builder valueOf(final PreReleaseVersion built) {
+
+<span class="nc" id="L101">            return new Builder().identifiers(built.getIdentifiers());</span>
+        }
+
+
+        private void identifier(final String identifier) {
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">            for (final String token : identifier.split(&quot;\\.&quot;)) {</span>
+<span class="nc" id="L108">                identifiers.add(requireValidIdentifier(token));</span>
+            }
+<span class="nc" id="L110">        }</span>
+
+
+        /**
+         * Adds identifiers.
+         *
+         * @param identifier an identifier.
+         * @param otherIdentifiers more identifers.
+         *
+         * @return this.
+         *
+         * @see PreReleaseVersion#requireValidIdentifier(java.lang.CharSequence)
+         */
+        public Builder identifiers(final String identifier,
+                                   final String... otherIdentifiers) {
+
+<span class="nc" id="L126">            identifier(identifier);</span>
+
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            if (otherIdentifiers != null) {</span>
+<span class="nc bnc" id="L129" title="All 2 branches missed.">                for (final String otherIdentifier : otherIdentifiers) {</span>
+<span class="nc" id="L130">                    identifier(otherIdentifier);</span>
+                }
+            }
+
+<span class="nc" id="L134">            return this;</span>
+        }
+
+
+        public Builder identifiers(final Iterator&lt;String&gt; identifiers) {
+
+<span class="nc bnc" id="L140" title="All 2 branches missed.">            while (identifiers.hasNext()) {</span>
+<span class="nc" id="L141">                identifier(identifiers.next());</span>
+            }
+
+<span class="nc" id="L144">            return this;</span>
+        }
+
+
+        public Builder identifiers(final Iterable&lt;String&gt; identifiers) {
+
+<span class="nc" id="L150">            return identifiers(identifiers.iterator());</span>
+        }
+
+
+        /**
+         * Builds an instance of {@code Release}.
+         *
+         * @return an instance of {@code Release}
+         */
+        public PreReleaseVersion build() {
+
+<span class="nc bnc" id="L161" title="All 2 branches missed.">            if (identifiers.isEmpty()) {</span>
+<span class="nc" id="L162">                throw new IllegalStateException(&quot;no identifiers&quot;);</span>
+            }
+
+<span class="nc" id="L165">            return new PreReleaseVersion(identifiers);</span>
+        }
+
+
+<span class="nc" id="L169">        private final List&lt;String&gt; identifiers = new ArrayList&lt;String&gt;();</span>
+
+    }
+
+
+    public static PreReleaseVersion valueOf(final String s) {
+
+<span class="nc" id="L176">        return Builder.valueOf(s).build();</span>
+    }
+
+
+    private PreReleaseVersion(final List&lt;String&gt; identifiers) {
+
+<span class="nc" id="L182">        super();</span>
+
+//        if (identifiers == null) {
+//            throw new NullPointerException(&quot;null identifiers&quot;);
+//        }
+//
+//        if (identifiers.isEmpty()) {
+//            throw new IllegalArgumentException(&quot;empty identifiers&quot;);
+//        }
+//
+//        for (final String identifier : identifiers) {
+//            if (!IDENTIFIER_PATTERN.matcher(identifier).matches()) {
+//                throw new IllegalArgumentException(
+//                    &quot;invalid identifier: &quot; + identifier);
+//            }
+//        }
+<span class="nc" id="L198">        this.identifiers = Collections.unmodifiableList(identifiers);</span>
+<span class="nc" id="L199">    }</span>
+
+
+    @Override
+    public int compareTo(final PreReleaseVersion o) {
+
+<span class="nc" id="L205">        final List&lt;String&gt; identifiers1</span>
+<span class="nc" id="L206">            = new ArrayList&lt;String&gt;(getIdentifiers());</span>
+<span class="nc" id="L207">        final List&lt;String&gt; identifiers2</span>
+<span class="nc" id="L208">            = new ArrayList&lt;String&gt;(o.getIdentifiers());</span>
+
+<span class="nc bnc" id="L210" title="All 4 branches missed.">        while (!identifiers1.isEmpty() &amp;&amp; !identifiers2.isEmpty()) {</span>
+<span class="nc" id="L211">            final String identifier1 = identifiers1.remove(0);</span>
+<span class="nc" id="L212">            final String identifier2 = identifiers2.remove(0);</span>
+<span class="nc" id="L213">            final boolean numeric1 = NormalVersion.IDENTIFIER_PATTERN</span>
+<span class="nc" id="L214">                .matcher(identifier1).matches();</span>
+<span class="nc" id="L215">            final boolean numeric2 = NormalVersion.IDENTIFIER_PATTERN</span>
+<span class="nc" id="L216">                .matcher(identifier2).matches();</span>
+            // Numeric identifiers always have lower precedence than
+            // non-numeric identifiers.
+<span class="nc bnc" id="L219" title="All 4 branches missed.">            if (numeric1 &amp;&amp; !numeric2) {</span>
+<span class="nc" id="L220">                return -1;</span>
+            }
+<span class="nc bnc" id="L222" title="All 4 branches missed.">            if (!numeric1 &amp;&amp; numeric2) {</span>
+<span class="nc" id="L223">                return 1;</span>
+            }
+            // identifiers consisting of only digits are compared
+            // numerically
+<span class="nc bnc" id="L227" title="All 4 branches missed.">            if (numeric1 &amp;&amp; numeric2) {</span>
+<span class="nc" id="L228">                final int numerically = new BigInteger(identifier1)</span>
+<span class="nc" id="L229">                    .compareTo(new BigInteger(identifier2));</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">                if (numerically != 0) {</span>
+<span class="nc" id="L231">                    return numerically;</span>
+                }
+            }
+            // identifiers with letters or hyphens are compared lexically in
+            // ASCII sort order
+<span class="nc" id="L236">            final int lexically = identifier1.compareTo(identifier2);</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">            if (lexically != 0) {</span>
+<span class="nc" id="L238">                return lexically;</span>
+            }
+<span class="nc" id="L240">        }</span>
+        // A larger set of pre-release fields has a higher precedence
+        // than a smaller set, if all of the preceding identifiers are
+        // equal.
+<span class="nc bnc" id="L244" title="All 4 branches missed.">        if (identifiers1.isEmpty() &amp;&amp; !identifiers2.isEmpty()) {</span>
+<span class="nc" id="L245">            return -1;</span>
+        }
+<span class="nc bnc" id="L247" title="All 4 branches missed.">        if (!identifiers1.isEmpty() &amp;&amp; identifiers2.isEmpty()) {</span>
+<span class="nc" id="L248">            return 1;</span>
+        }
+
+<span class="nc" id="L251">        return 0;</span>
+    }
+
+
+    /**
+     * Returns a string representation of this release.
+     *
+     * @return a string representation of this release
+     */
+    @Override
+    public String toString() {
+
+<span class="nc" id="L263">        final StringBuilder builder = new StringBuilder();</span>
+
+<span class="nc" id="L265">        final Iterator&lt;String&gt; i = identifiers.iterator();</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">        if (i.hasNext()) {</span>
+<span class="nc" id="L267">            builder.append(i.next());</span>
+        }
+<span class="nc bnc" id="L269" title="All 2 branches missed.">        while (i.hasNext()) {</span>
+<span class="nc" id="L270">            builder.append('.').append(i.next());</span>
+        }
+
+<span class="nc" id="L273">        return builder.toString();</span>
+    }
+
+
+    /**
+     * Returns an unmodifiable list of identifiers.
+     *
+     * @return an unmodifiable list of identifiers.
+     */
+    public List&lt;String&gt; getIdentifiers() {
+
+<span class="nc" id="L284">        return identifiers;</span>
+    }
+
+
+    private final List&lt;String&gt; identifiers;
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
