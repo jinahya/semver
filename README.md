@@ -9,8 +9,8 @@ A small library implementing [Semantic Versioning](http://semver.org).
 ## Versions
 |Version|Site|Apidocs|Notes|
 |-------|----|-------|-----|
-|0.2.0-SNAPSHOT|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.2.0-SNAPSHOT/index.html)|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.2.0-SNAPSHOT/apidocs/index.html)||
-|0.1.0|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.0.1/index.html)|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.0.1/apidocs/index.html)||
+|0.3.0-SNAPSHOT|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.3.0-SNAPSHOT/index.html)|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.3.0-SNAPSHOT/apidocs/index.html)||
+|0.2.0|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.2.0/index.html)|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.2.0/apidocs/index.html)||
 
 ## Usages
 ### Build metadata
