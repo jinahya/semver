@@ -6,6 +6,9 @@
 
 A small library implementing [Semantic Versioning](http://semver.org).
 ## Versions
+|Version|Site|Apidocs|Notes|
+|-------|----|-------|-----|
+|0.1.0|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.0.1/index.html)|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.0.1/apidocs/index.html)||
 
 ## Usages
 ### Build metadata
