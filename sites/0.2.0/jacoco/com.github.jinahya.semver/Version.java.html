@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>Version.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">semver</a> &gt; <a href="index.source.html" class="el_package">com.github.jinahya.semver</a> &gt; <span class="el_source">Version.java</span></div><h1>Version.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015 Jin Kwon &amp;lt;jinahya_at_gmail.com&amp;gt;.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.jinahya.semver;
+
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
+/**
+ *
+ * @author Jin Kwon &amp;lt;jinahya_at_gmail.com&amp;gt;
+ */
+public class Version {
+
+
+    private static final String REGEXP
+        = &quot;(\\d+)\\.(\\d+)\\.(\\d+)(-([^\\+]*))?(\\+(.+))?&quot;;
+
+
+<span class="nc" id="L35">    private static final Pattern PATTERN = Pattern.compile(REGEXP);</span>
+
+
+    public static String requireValidValue(final String value) {
+
+<span class="nc bnc" id="L40" title="All 2 branches missed.">        if (value == null) {</span>
+<span class="nc" id="L41">            throw new NullPointerException(&quot;null input&quot;);</span>
+        }
+
+<span class="nc bnc" id="L44" title="All 2 branches missed.">        if (!PATTERN.matcher(value).matches()) {</span>
+<span class="nc" id="L45">            throw new IllegalArgumentException(&quot;version not matches: &quot; + value);</span>
+        }
+
+<span class="nc" id="L48">        return value;</span>
+    }
+
+
+<span class="nc" id="L52">    public static class Builder {</span>
+
+
+        public Version build() {
+
+<span class="nc" id="L57">            return new Version(value());</span>
+        }
+
+
+        private String value() {
+
+<span class="nc" id="L63">            final StringBuilder builder</span>
+<span class="nc" id="L64">                = new StringBuilder(String.valueOf(major))</span>
+<span class="nc" id="L65">                .append('.')</span>
+<span class="nc" id="L66">                .append(String.valueOf(minor))</span>
+<span class="nc" id="L67">                .append('.')</span>
+<span class="nc" id="L68">                .append(String.valueOf(patch));</span>
+
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            if (release != null) {</span>
+<span class="nc" id="L71">                builder.append('-').append(release.getValue());</span>
+            }
+
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            if (metadata != null) {</span>
+<span class="nc" id="L75">                builder.append('+').append(metadata.getValue());</span>
+            }
+
+<span class="nc" id="L78">            return builder.toString();</span>
+        }
+
+
+        public int getMajor() {
+
+<span class="nc" id="L84">            return major;</span>
+        }
+
+
+        public void setMajor(final int major) {
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            if (major &lt; 0) {</span>
+<span class="nc" id="L91">                throw new IllegalArgumentException(&quot;major(&quot; + major + &quot;) &lt; 0&quot;);</span>
+            }
+
+<span class="nc" id="L94">            this.major = major;</span>
+<span class="nc" id="L95">        }</span>
+
+
+        public Builder major(final int major) {
+
+<span class="nc" id="L100">            setMajor(major);</span>
+
+<span class="nc" id="L102">            return this;</span>
+        }
+
+
+        public int getMinor() {
+
+<span class="nc" id="L108">            return minor;</span>
+        }
+
+
+        public void setMinor(final int minor) {
+
+<span class="nc" id="L114">            this.minor = minor;</span>
+<span class="nc" id="L115">        }</span>
+
+
+        public Builder minor(final int minor) {
+
+<span class="nc" id="L120">            setMinor(minor);</span>
+
+<span class="nc" id="L122">            return this;</span>
+        }
+
+
+        public int getPatch() {
+
+<span class="nc" id="L128">            return patch;</span>
+        }
+
+
+        public void setPatch(final int patch) {
+
+<span class="nc" id="L134">            this.patch = patch;</span>
+<span class="nc" id="L135">        }</span>
+
+
+        public Builder patch(final int patch) {
+
+<span class="nc" id="L140">            setPatch(patch);</span>
+
+<span class="nc" id="L142">            return this;</span>
+        }
+
+
+        public Release getRelease() {
+
+<span class="nc" id="L148">            return release;</span>
+        }
+
+
+        public void setRelease(final Release release) {
+
+<span class="nc" id="L154">            this.release = release;</span>
+<span class="nc" id="L155">        }</span>
+
+
+        public Builder release(final Release release) {
+
+<span class="nc" id="L160">            setRelease(release);</span>
+
+<span class="nc" id="L162">            return this;</span>
+        }
+
+
+        public Builder release(final Release.Builder builder) {
+
+<span class="nc" id="L168">            return release(builder.build());</span>
+        }
+
+
+        public Builder release(final String value) {
+
+<span class="nc" id="L174">            return release(Release.valueOf(value));</span>
+        }
+
+
+        public Metadata getMetadata() {
+
+<span class="nc" id="L180">            return metadata;</span>
+        }
+
+
+        public void setMetadata(final Metadata metadata) {
+
+<span class="nc" id="L186">            this.metadata = metadata;</span>
+<span class="nc" id="L187">        }</span>
+
+
+        public Builder metadata(final Metadata metadata) {
+
+<span class="nc" id="L192">            setMetadata(metadata);</span>
+
+<span class="nc" id="L194">            return this;</span>
+        }
+
+
+        public Builder metadata(final Metadata.Builder builder) {
+
+<span class="nc" id="L200">            return metadata(builder.build());</span>
+        }
+
+
+        public Builder metadata(final String value) {
+
+<span class="nc" id="L206">            return metadata(Metadata.valueOf(value));</span>
+        }
+
+
+        private int major;
+
+
+        private int minor;
+
+
+        private int patch;
+
+
+        private Release release;
+
+
+        private Metadata metadata;
+
+    }
+
+
+    public static Builder valueOf(final String s) {
+
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        if (s == null) {</span>
+<span class="nc" id="L230">            throw new NullPointerException(&quot;null string&quot;);</span>
+        }
+
+<span class="nc" id="L233">        final Matcher matcher = PATTERN.matcher(s);</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">        if (!matcher.matches()) {</span>
+<span class="nc" id="L235">            throw new IllegalArgumentException(&quot;invalid version string: &quot; + s);</span>
+        }
+
+<span class="nc" id="L238">        final Builder builder = new Builder()</span>
+<span class="nc" id="L239">            .major(Integer.parseInt(matcher.group(1)))</span>
+<span class="nc" id="L240">            .minor(Integer.parseInt(matcher.group(2)))</span>
+<span class="nc" id="L241">            .patch(Integer.parseInt(matcher.group(3)));</span>
+
+<span class="nc" id="L243">        final String releaseValue = matcher.group(5);</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">        if (releaseValue != null) {</span>
+<span class="nc" id="L245">            builder.release(Release.valueOf(releaseValue));</span>
+        }
+
+<span class="nc" id="L248">        final String metadataValue = matcher.group(7);</span>
+<span class="nc bnc" id="L249" title="All 2 branches missed.">        if (metadataValue != null) {</span>
+<span class="nc" id="L250">            builder.metadata(Metadata.valueOf(metadataValue));</span>
+        }
+
+<span class="nc" id="L253">        return builder;</span>
+    }
+
+
+    private Version(final String value) {
+
+<span class="nc" id="L259">        super();</span>
+
+<span class="nc" id="L261">        this.value = requireValidValue(value);</span>
+<span class="nc" id="L262">    }</span>
+
+
+    @Override
+    public String toString() {
+
+<span class="nc" id="L268">        return super.toString() + &quot;{&quot; + &quot;value=&quot; + value + &quot;}&quot;;</span>
+    }
+
+
+    public String getValue() {
+
+<span class="nc" id="L274">        return value;</span>
+    }
+
+
+    private final String value;
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>

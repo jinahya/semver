@@ -1,0 +1,519 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../.resources/report.css" type="text/css"/><link rel="shortcut icon" href="../.resources/report.gif" type="image/gif"/><title>NormalVersion.java</title><link rel="stylesheet" href="../.resources/prettify.css" type="text/css"/><script type="text/javascript" src="../.resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../.sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">semver</a> &gt; <a href="index.source.html" class="el_package">com.github.jinahya.semver</a> &gt; <span class="el_source">NormalVersion.java</span></div><h1>NormalVersion.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2015 Jin Kwon &amp;lt;jinahya_at_gmail.com&amp;gt;.
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.github.jinahya.semver;
+
+
+import java.util.function.IntUnaryOperator;
+import java.util.function.UnaryOperator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
+/**
+ *
+ * @author Jin Kwon &amp;lt;jinahya_at_gmail.com&amp;gt;
+ */
+public class NormalVersion implements Comparable&lt;NormalVersion&gt; {
+
+
+    private static final String IDENTIFIER_REGEX = &quot;0|[1-9][0-9]*&quot;;
+
+
+<span class="nc" id="L36">    public static final Pattern IDENTIFIER_PATTERN</span>
+<span class="nc" id="L37">        = Pattern.compile(IDENTIFIER_REGEX);</span>
+
+
+    private static final String REGEXP
+        = &quot;(\\d+)\\.(\\d+)\\.(\\d+)(-([^\\+]*))?(\\+(.+))?&quot;;
+
+
+<span class="nc" id="L44">    private static final Pattern PATTERN = Pattern.compile(REGEXP);</span>
+
+
+    private static &lt;T extends CharSequence&gt; T requireValidIdentifier(
+        final T identifier) {
+
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (!IDENTIFIER_PATTERN.matcher(identifier).matches()) {</span>
+<span class="nc" id="L51">            throw new IllegalArgumentException(</span>
+                &quot;invalid identifier: &quot; + identifier);
+        }
+
+<span class="nc" id="L55">        return identifier;</span>
+    }
+
+
+<span class="nc" id="L59">    public static class Builder {</span>
+
+
+        public static Builder valueOf(final String s) {
+
+<span class="nc" id="L64">            final Matcher matcher = PATTERN.matcher(s);</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">            if (!matcher.matches()) {</span>
+<span class="nc" id="L66">                throw new IllegalArgumentException(&quot;invalid: &quot; + s);</span>
+            }
+
+<span class="nc" id="L69">            final Builder builder = new Builder()</span>
+<span class="nc" id="L70">                .majorVersion(matcher.group(1))</span>
+<span class="nc" id="L71">                .minorVersion(matcher.group(2))</span>
+<span class="nc" id="L72">                .patchVersion(matcher.group(3));</span>
+
+<span class="nc" id="L74">            final String preReleaseVersionString = matcher.group(5);</span>
+<span class="nc bnc" id="L75" title="All 2 branches missed.">            if (preReleaseVersionString != null) {</span>
+<span class="nc" id="L76">                builder.preReeleaseVersion(</span>
+<span class="nc" id="L77">                    PreReleaseVersion.valueOf(preReleaseVersionString));</span>
+            }
+
+<span class="nc" id="L80">            final String buildMetadataString = matcher.group(7);</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            if (buildMetadataString != null) {</span>
+<span class="nc" id="L82">                builder.buildMetadata(</span>
+<span class="nc" id="L83">                    BuildMetadata.valueOf(buildMetadataString));</span>
+            }
+
+<span class="nc" id="L86">            return builder;</span>
+        }
+
+
+        public static Builder valueOf(final NormalVersion o) {
+
+<span class="nc" id="L92">            return new Builder()</span>
+<span class="nc" id="L93">                .majorVersion(o.getMajorVersion())</span>
+<span class="nc" id="L94">                .minorVersion(o.getMinorVersion())</span>
+<span class="nc" id="L95">                .patchVersion(o.getPatchVersion())</span>
+<span class="nc" id="L96">                .preReeleaseVersion(o.getPreReleaseVersion())</span>
+<span class="nc" id="L97">                .buildMetadata(o.getBuildMetadata());</span>
+        }
+
+
+        public NormalVersion build() {
+
+<span class="nc" id="L103">            return new NormalVersion(majorVersion, minorVersion, patchVersion,</span>
+                                     preReleaseVersion, buildMetadata);
+        }
+
+
+        public Builder majorVersion(final int v) {
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">            if (v &lt; 0) {</span>
+<span class="nc" id="L111">                throw new IllegalArgumentException(&quot;negative: &quot; + v);</span>
+            }
+
+<span class="nc" id="L114">            final int previous = this.majorVersion;</span>
+<span class="nc" id="L115">            this.majorVersion = v;</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">            if (previous &lt; this.majorVersion) {</span>
+<span class="nc" id="L117">                minorVersion(0);</span>
+<span class="nc" id="L118">                patchVersion(0);</span>
+            }
+
+<span class="nc" id="L121">            return this;</span>
+        }
+
+
+        public Builder majorVersion(final String s) {
+
+<span class="nc" id="L127">            return majorVersion(Integer.parseInt(requireValidIdentifier(s)));</span>
+        }
+
+
+        public Builder minorVersion(final int v) {
+
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            if (v &lt; 0) {</span>
+<span class="nc" id="L134">                throw new IllegalArgumentException(&quot;negative: &quot; + v);</span>
+            }
+
+<span class="nc" id="L137">            final int previous = this.minorVersion;</span>
+<span class="nc" id="L138">            this.minorVersion = v;</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">            if (previous &lt; this.minorVersion) {</span>
+<span class="nc" id="L140">                patchVersion(0);</span>
+            }
+
+<span class="nc" id="L143">            return this;</span>
+        }
+
+
+        public Builder minorVersion(final IntUnaryOperator operator) {
+
+<span class="nc" id="L149">            return minorVersion(operator.applyAsInt(minorVersion));</span>
+        }
+
+
+        public Builder increaseMinorVersion() {
+
+<span class="nc" id="L155">            return minorVersion(minorVersion + 1);</span>
+        }
+
+
+        public Builder minorVersion(final String s) {
+
+<span class="nc" id="L161">            return minorVersion(Integer.parseInt(requireValidIdentifier(s)));</span>
+        }
+
+
+        public Builder patchVersion(final int patchVersion) {
+
+<span class="nc bnc" id="L167" title="All 2 branches missed.">            if (patchVersion &lt; 0) {</span>
+<span class="nc" id="L168">                throw new IllegalArgumentException(&quot;negative: &quot; + patchVersion);</span>
+            }
+
+<span class="nc" id="L171">            this.patchVersion = patchVersion;</span>
+
+<span class="nc" id="L173">            return this;</span>
+        }
+
+
+        public Builder patchVersion(final IntUnaryOperator operator) {
+
+<span class="nc" id="L179">            return patchVersion(operator.applyAsInt(patchVersion));</span>
+        }
+
+
+        public Builder increasePatchVersion() {
+
+<span class="nc" id="L185">            return patchVersion(patchVersion + 1);</span>
+        }
+
+
+        public Builder patchVersion(final String s) {
+
+<span class="nc" id="L191">            return patchVersion(Integer.parseInt(requireValidIdentifier(s)));</span>
+        }
+
+
+        public Builder preReeleaseVersion(final PreReleaseVersion v) {
+
+<span class="nc" id="L197">            this.preReleaseVersion = v;</span>
+
+<span class="nc" id="L199">            return this;</span>
+        }
+
+
+        public Builder preReleaseVersion(
+            final UnaryOperator&lt;PreReleaseVersion&gt; operator) {
+
+<span class="nc" id="L206">            return preReeleaseVersion(operator.apply(preReleaseVersion));</span>
+        }
+
+
+        public Builder preReleaseVersion(final PreReleaseVersion.Builder b) {
+
+<span class="nc" id="L212">            return preReeleaseVersion(b.build());</span>
+        }
+
+
+        public Builder preReleaseVersion(final String s) {
+
+<span class="nc" id="L218">            return preReleaseVersion(PreReleaseVersion.Builder.valueOf(s));</span>
+        }
+
+
+        public Builder buildMetadata(final BuildMetadata v) {
+
+<span class="nc" id="L224">            this.buildMetadata = v;</span>
+
+<span class="nc" id="L226">            return this;</span>
+        }
+
+
+        public Builder buildMetadata(
+            final UnaryOperator&lt;BuildMetadata&gt; operator) {
+
+<span class="nc" id="L233">            return buildMetadata(operator.apply(buildMetadata));</span>
+        }
+
+
+        public Builder buildMetadata(final BuildMetadata.Builder b) {
+
+<span class="nc" id="L239">            return buildMetadata(b.build());</span>
+        }
+
+
+        public Builder buildMetadata(final String s) {
+
+<span class="nc" id="L245">            return buildMetadata(BuildMetadata.Builder.valueOf(s));</span>
+        }
+
+
+        private int majorVersion;
+
+
+        private int minorVersion;
+
+
+        private int patchVersion;
+
+
+        private PreReleaseVersion preReleaseVersion;
+
+
+        private BuildMetadata buildMetadata;
+
+    }
+
+
+    public static NormalVersion valueOf(final String s) {
+
+<span class="nc" id="L268">        return Builder.valueOf(s).build();</span>
+    }
+
+
+    private NormalVersion(final int major, final int minor, final int patch,
+                          final PreReleaseVersion release,
+                          final BuildMetadata metadata) {
+
+<span class="nc" id="L276">        super();</span>
+
+<span class="nc" id="L278">        this.majorVersion = major;</span>
+<span class="nc" id="L279">        this.minorVersion = minor;</span>
+<span class="nc" id="L280">        this.patchVersion = patch;</span>
+<span class="nc" id="L281">        this.preReleaseVersion = release;</span>
+<span class="nc" id="L282">        this.buildMetadata = metadata;</span>
+<span class="nc" id="L283">    }</span>
+
+
+    @Override
+    public int compareTo(final NormalVersion o) {
+
+<span class="nc bnc" id="L289" title="All 2 branches missed.">        if (o == null) {</span>
+<span class="nc" id="L290">            throw new NullPointerException(&quot;null o&quot;);</span>
+        }
+
+<span class="nc" id="L293">        final int majorCompared = getMajorVersion() - o.getMajorVersion();</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">        if (majorCompared != 0) {</span>
+<span class="nc" id="L295">            return majorCompared;</span>
+        }
+
+<span class="nc" id="L298">        final int minorCompared = getMajorVersion() - o.getMajorVersion();</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (minorCompared != 0) {</span>
+<span class="nc" id="L300">            return minorCompared;</span>
+        }
+
+<span class="nc" id="L303">        final int patchCompared = getPatchVersion() - o.getPatchVersion();</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">        if (patchCompared != 0) {</span>
+<span class="nc" id="L305">            return patchCompared;</span>
+        }
+
+        // a pre-release version has lower precedence than a normal version
+<span class="nc bnc" id="L309" title="All 2 branches missed.">        if (getPreReleaseVersion() == null</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">            &amp;&amp; o.getPreReleaseVersion() != null) {</span>
+<span class="nc" id="L311">            return 1;</span>
+        }
+<span class="nc bnc" id="L313" title="All 2 branches missed.">        if (getPreReleaseVersion() != null</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">            &amp;&amp; o.getPreReleaseVersion() == null) {</span>
+<span class="nc" id="L315">            return -1;</span>
+        }
+<span class="nc bnc" id="L317" title="All 2 branches missed.">        if (getPreReleaseVersion() != null</span>
+<span class="nc bnc" id="L318" title="All 2 branches missed.">            &amp;&amp; o.getPreReleaseVersion() != null) {</span>
+<span class="nc" id="L319">            final int releaseCompared</span>
+<span class="nc" id="L320">                = getPreReleaseVersion().compareTo(o.getPreReleaseVersion());</span>
+<span class="nc bnc" id="L321" title="All 2 branches missed.">            if (releaseCompared != 0) {</span>
+<span class="nc" id="L322">                return releaseCompared;</span>
+            }
+        }
+
+<span class="nc" id="L326">        return 0;</span>
+    }
+
+
+    @Override
+    public String toString() {
+
+<span class="nc" id="L333">        final StringBuilder builder = new StringBuilder()</span>
+<span class="nc" id="L334">            .append(String.valueOf(getMajorVersion()))</span>
+<span class="nc" id="L335">            .append('.')</span>
+<span class="nc" id="L336">            .append(String.valueOf(getMinorVersion()))</span>
+<span class="nc" id="L337">            .append('.')</span>
+<span class="nc" id="L338">            .append(String.valueOf(getPatchVersion()));</span>
+
+<span class="nc bnc" id="L340" title="All 2 branches missed.">        if (getPreReleaseVersion() != null) {</span>
+<span class="nc" id="L341">            builder.append('-').append(getPreReleaseVersion());</span>
+        }
+
+<span class="nc bnc" id="L344" title="All 2 branches missed.">        if (getBuildMetadata() != null) {</span>
+<span class="nc" id="L345">            builder.append('+').append(getBuildMetadata());</span>
+        }
+
+<span class="nc" id="L348">        return builder.toString();</span>
+    }
+
+
+    /**
+     * Returns major version.
+     *
+     * @return major version.
+     */
+    public int getMajorVersion() {
+
+<span class="nc" id="L359">        return majorVersion;</span>
+    }
+
+
+    public NormalVersion getMajorVersionSet(final int value) {
+
+<span class="nc" id="L365">        return Builder.valueOf(this).majorVersion(value).build();</span>
+    }
+
+
+    /**
+     * Returns a new instance with major version increased.
+     *
+     * @return a new instance with major version increased.
+     */
+    public NormalVersion getMajorVersionIncreased() {
+
+<span class="nc" id="L376">        return getMajorVersionSet(majorVersion + 1);</span>
+    }
+
+
+    public NormalVersion getMajorVersionSet(final IntUnaryOperator operator) {
+
+<span class="nc" id="L382">        return getMajorVersionSet(operator.applyAsInt(majorVersion));</span>
+    }
+
+
+    /**
+     * Returns minor version.
+     *
+     * @return minor version.
+     */
+    public int getMinorVersion() {
+
+<span class="nc" id="L393">        return minorVersion;</span>
+    }
+
+
+    public NormalVersion getMinorVersionSet(final int value) {
+
+<span class="nc" id="L399">        return Builder.valueOf(this).minorVersion(value).build();</span>
+    }
+
+
+    /**
+     * Returns a new instance with minor version increased.
+     *
+     * @return a new instance with minor version increased.
+     */
+    public NormalVersion getMinorVersionIncreased() {
+
+<span class="nc" id="L410">        return getMinorVersionSet(minorVersion + 1);</span>
+    }
+
+
+    public NormalVersion getMinorVersoinSet(final IntUnaryOperator operator) {
+
+<span class="nc" id="L416">        return getMinorVersionSet(operator.applyAsInt(minorVersion));</span>
+    }
+
+
+    /**
+     * Returns patch version.
+     *
+     * @return patch version.
+     */
+    public int getPatchVersion() {
+
+<span class="nc" id="L427">        return patchVersion;</span>
+    }
+
+
+    public NormalVersion getPatchVersionSet(final int value) {
+
+<span class="nc" id="L433">        return Builder.valueOf(this).patchVersion(value).build();</span>
+    }
+
+
+    /**
+     * Returns a new instance with patch version increased.
+     *
+     * @return a new instance with patch version increased.
+     */
+    public NormalVersion getPatchVersionIncreased() {
+
+<span class="nc" id="L444">        return getPatchVersionSet(patchVersion + 1);</span>
+    }
+
+
+    public NormalVersion getPatchVersoinSet(final IntUnaryOperator operator) {
+
+<span class="nc" id="L450">        return getPatchVersionSet(operator.applyAsInt(patchVersion));</span>
+    }
+
+
+    /**
+     * Returns pre-release version.
+     *
+     * @return pre-release version.
+     */
+    public PreReleaseVersion getPreReleaseVersion() {
+
+<span class="nc" id="L461">        return preReleaseVersion;</span>
+    }
+
+
+    public NormalVersion getPreReleaseVersionSet(
+        final PreReleaseVersion value) {
+
+<span class="nc" id="L468">        return Builder.valueOf(this).preReeleaseVersion(value).build();</span>
+    }
+
+
+    public NormalVersion getPreReleaseVersionSet(
+        final UnaryOperator&lt;PreReleaseVersion&gt; operator) {
+
+<span class="nc" id="L475">        return getPreReleaseVersionSet(operator.apply(preReleaseVersion));</span>
+    }
+
+
+    /**
+     * Returns build metadata.
+     *
+     * @return build metadata
+     */
+    public BuildMetadata getBuildMetadata() {
+
+<span class="nc" id="L486">        return buildMetadata;</span>
+    }
+
+
+    public NormalVersion getBuildMetadataSet(final BuildMetadata value) {
+
+<span class="nc" id="L492">        return Builder.valueOf(this).buildMetadata(value).build();</span>
+    }
+
+
+    public NormalVersion getBuildeMetadataSet(
+        final UnaryOperator&lt;BuildMetadata&gt; operator) {
+
+<span class="nc" id="L499">        return getBuildMetadataSet(operator.apply(buildMetadata));</span>
+    }
+
+
+    private final int majorVersion;
+
+
+    private final int minorVersion;
+
+
+    private final int patchVersion;
+
+
+    private final PreReleaseVersion preReleaseVersion;
+
+
+    private final BuildMetadata buildMetadata;
+
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.5.201505241946</span></div></body></html>
