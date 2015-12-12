@@ -44,9 +44,7 @@ public class ReleaseTest {
     public void valueOf() {
 
         VALIDS.forEach(expected -> {
-            logger.debug("expected : {}", expected);
-            final String actual = Release.valueOf(expected).build().getValue();
-            logger.debug("actual: {}", actual);
+            final String actual = Release.valueOf(expected).getValue();
             assertEquals(actual, expected);
         });
     }

@@ -36,8 +36,5 @@ public class RegExTest {
         final Matcher matcher = pattern.matcher(null);
     }
 
-;
-
-
 }
 

@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 
 /**
+ * Represents a {@code build metadata} of the {@code Semantic Versioning}.
  *
  * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
  */
@@ -33,7 +34,7 @@ public class Metadata {
     private static final String IDENTIFIER_REGEXP = "[0-9A-Za-z-]+";
 
 
-    private static final Pattern IDENTIFIER_PATTERN
+    public static final Pattern IDENTIFIER_PATTERN
         = Pattern.compile(IDENTIFIER_REGEXP);
 
 
@@ -53,36 +54,53 @@ public class Metadata {
     }
 
 
-    public static String requireValidValue(final String value) {
-
-        if (value == null) {
-            throw new NullPointerException("null value");
-        }
-
-        for (final String identifier : value.split("\\.")) {
-            requireValidIdentifier(identifier);
-        }
-
-        return value;
-    }
-
-
+//    public static String requireValidValue(final String value) {
+//
+//        if (value == null) {
+//            throw new NullPointerException("null value");
+//        }
+//
+//        for (final String identifier : value.split("\\.")) {
+//            requireValidIdentifier(identifier);
+//        }
+//
+//        return value;
+//    }
     public static class Builder {
 
 
+        public static Builder valueOf(final String s) {
+
+            final Builder builder = new Builder();
+
+            for (final String identifier : s.split("\\.")) {
+                builder.identifiers(identifier);
+            }
+
+            return builder;
+        }
+
+
+        /**
+         * Adds identifies.
+         *
+         * @param identifier an identifier
+         * @param otherIdentifiers more identifiers
+         *
+         * @return this
+         */
         public Builder identifiers(final String identifier,
                                    final String... otherIdentifiers) {
 
             if (identifier == null) {
-                throw new NullPointerException("null identifiers");
+                throw new NullPointerException("null identifier");
             }
 
-            getIdentifiers().add(requireValidIdentifier(identifier));
+            identifiers.add(requireValidIdentifier(identifier));
 
             if (otherIdentifiers != null) {
                 for (final String otherIdentifier : otherIdentifiers) {
-                    getIdentifiers().add(
-                        requireValidIdentifier(otherIdentifier));
+                    identifiers.add(requireValidIdentifier(otherIdentifier));
                 }
             }
 
@@ -90,11 +108,58 @@ public class Metadata {
         }
 
 
+        /**
+         * Adds identifiers.
+         *
+         * @param identifiers identifiers
+         *
+         * @return this
+         */
+        public Builder identifiers(final Iterator<String> identifiers) {
+
+            if (identifiers == null) {
+                throw new NullPointerException("null identifiers");
+            }
+
+            while (identifiers.hasNext()) {
+                identifiers(identifiers.next());
+            }
+
+            return this;
+        }
+
+
+        /**
+         * Adds identifiers.
+         *
+         * @param identifiers identifiers
+         *
+         * @return this
+         */
+        public Builder identifiers(final Iterable<String> identifiers) {
+
+            if (identifiers == null) {
+                throw new NullPointerException("null identifiers");
+            }
+
+            return identifiers(identifiers.iterator());
+        }
+
+
+        /**
+         * Builds to an instance of {@code Metadata}.
+         *
+         * @return an instance of {@code Metadata}
+         */
         public Metadata build() {
+
+            if (identifiers.isEmpty()) {
+                throw new IllegalStateException("no identifiers");
+            }
 
             final StringBuilder builder = new StringBuilder();
 
-            final Iterator<String> i = getIdentifiers().iterator();
+            final Iterator<String> i = identifiers.iterator();
             if (i.hasNext()) {
                 builder.append(i.next());
             }
@@ -106,30 +171,25 @@ public class Metadata {
         }
 
 
+        /**
+         * Returns a copied list of identifiers.
+         *
+         * @return a copied list of identifiers.
+         */
         public List<String> getIdentifiers() {
 
-            if (identifiers == null) {
-                identifiers = new ArrayList<String>();
-            }
-
-            return identifiers;
+            return new ArrayList<String>(identifiers);
         }
 
 
-        private List<String> identifiers;
+        private final List<String> identifiers = new ArrayList<String>();
 
     }
 
 
-    public static Builder valueOf(final String s) {
+    public static Metadata valueOf(final String s) {
 
-        final Builder builder = new Builder();
-
-        for (final String identifier : s.split("\\.")) {
-            builder.identifiers(identifier);
-        }
-
-        return builder;
+        return Builder.valueOf(s).build();
     }
 
 
@@ -137,7 +197,8 @@ public class Metadata {
 
         super();
 
-        this.value = requireValidValue(value);
+//        this.value = requireValidValue(value);
+        this.value = value;
     }
 
 
@@ -150,6 +211,11 @@ public class Metadata {
     }
 
 
+    /**
+     * Returns the value of this instance.
+     *
+     * @return the value.
+     */
     public String getValue() {
 
         return value;

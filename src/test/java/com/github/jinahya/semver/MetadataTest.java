@@ -44,9 +44,7 @@ public class MetadataTest {
     public static void valueOf() {
 
         VALIDS.forEach(expected -> {
-            logger.debug("expected : {}", expected);
-            final String actual = Metadata.valueOf(expected).build().getValue();
-            logger.debug("actual: {}", actual);
+            final String actual = Metadata.valueOf(expected).getValue();
             assertEquals(actual, expected);
         });
     }

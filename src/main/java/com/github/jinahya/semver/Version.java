@@ -25,7 +25,14 @@ import java.util.regex.Pattern;
  *
  * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
  */
-public class Version {
+public class Version implements Comparable<Version> {
+
+
+    private static final String IDENTIFIER_REGEX = "0|[1-9][0-9]*";
+
+
+    public static final Pattern IDENTIFIER_PATTERN
+        = Pattern.compile(IDENTIFIER_REGEX);
 
 
     private static final String REGEXP
@@ -35,30 +42,107 @@ public class Version {
     private static final Pattern PATTERN = Pattern.compile(REGEXP);
 
 
-    public static String requireValidValue(final String value) {
+    public static String requireValidIdentifier(final String identifier) {
 
-        if (value == null) {
-            throw new NullPointerException("null input");
+        if (identifier == null) {
+            throw new NullPointerException("null identifier");
         }
 
-        if (!PATTERN.matcher(value).matches()) {
-            throw new IllegalArgumentException("version not matches: " + value);
+        if (!IDENTIFIER_PATTERN.matcher(identifier).matches()) {
+            throw new IllegalArgumentException(
+                "invalid identifier: " + identifier);
         }
 
-        return value;
+        return identifier;
     }
 
 
-    public static class Builder {
+//    private static String requireValidValue(final String value) {
+//
+//        if (value == null) {
+//            throw new NullPointerException("null value");
+//        }
+//
+//        if (!PATTERN.matcher(value).matches()) {
+//            throw new IllegalArgumentException("invalid verison: " + value);
+//        }
+//
+//        return value;
+//    }
+    public static class Builder implements Comparable<Builder> {
 
 
-        public Version build() {
+        public static Builder valueOf(final String s) {
 
-            return new Version(value());
+            if (s == null) {
+                throw new NullPointerException("null string");
+            }
+
+            final Matcher matcher = PATTERN.matcher(s);
+            if (!matcher.matches()) {
+                throw new IllegalArgumentException("invalid value: " + s);
+            }
+
+            final Builder builder = new Builder()
+                .major(matcher.group(1))
+                .minor(matcher.group(2))
+                .patch(matcher.group(3));
+
+            final String releaseValue = matcher.group(5);
+            if (releaseValue != null) {
+                builder.release(Release.valueOf(releaseValue));
+            }
+
+            final String metadataValue = matcher.group(7);
+            if (metadataValue != null) {
+                builder.metadata(Metadata.valueOf(metadataValue));
+            }
+
+            return builder;
         }
 
 
-        private String value() {
+        @Override
+        public int compareTo(final Builder o) {
+
+            if (o == null) {
+                throw new NullPointerException("null o");
+            }
+
+            final int majorCompared = major - o.major;
+            if (majorCompared != 0) {
+                return majorCompared;
+            }
+
+            final int minorCompared = minor - o.minor;
+            if (minorCompared != 0) {
+                return minorCompared;
+            }
+
+            final int patchCompared = patch - o.patch;
+            if (patchCompared != 0) {
+                return patchCompared;
+            }
+
+            // a pre-release version has lower precedence than a normal version
+            if (release == null && o.release != null) {
+                return 1;
+            }
+            if (release != null && o.release == null) {
+                return -1;
+            }
+            if (release != null && o.release != null) {
+                final int releaseCompared = release.compareTo(o.release);
+                if (releaseCompared != 0) {
+                    return releaseCompared;
+                }
+            }
+
+            return 0;
+        }
+
+
+        public Version build() {
 
             final StringBuilder builder
                 = new StringBuilder(String.valueOf(major))
@@ -75,7 +159,7 @@ public class Version {
                 builder.append('+').append(metadata.getValue());
             }
 
-            return builder.toString();
+            return new Version(builder.toString());
         }
 
 
@@ -88,10 +172,15 @@ public class Version {
         public void setMajor(final int major) {
 
             if (major < 0) {
-                throw new IllegalArgumentException("major(" + major + ") < 0");
+                throw new IllegalArgumentException("negative major: " + major);
             }
 
+            final int previous = this.major;
             this.major = major;
+            if (previous < this.major) {
+                setMinor(0);
+                setPatch(0);
+            }
         }
 
 
@@ -103,6 +192,20 @@ public class Version {
         }
 
 
+        public Builder major(final String major) {
+
+            if (major == null) {
+                throw new NullPointerException("null major");
+            }
+
+            if (!IDENTIFIER_PATTERN.matcher(major).matches()) {
+                throw new IllegalArgumentException("invalid major: " + major);
+            }
+
+            return major(Integer.parseInt(requireValidIdentifier(major)));
+        }
+
+
         public int getMinor() {
 
             return minor;
@@ -111,7 +214,15 @@ public class Version {
 
         public void setMinor(final int minor) {
 
+            if (minor < 0) {
+                throw new IllegalArgumentException("negative minor: " + minor);
+            }
+
+            final int previous = this.minor;
             this.minor = minor;
+            if (previous < this.minor) {
+                setPatch(0);
+            }
         }
 
 
@@ -120,6 +231,20 @@ public class Version {
             setMinor(minor);
 
             return this;
+        }
+
+
+        public Builder minor(final String minor) {
+
+            if (minor == null) {
+                throw new NullPointerException("null minor");
+            }
+
+            if (!IDENTIFIER_PATTERN.matcher(minor).matches()) {
+                throw new IllegalArgumentException("invalid minor: " + minor);
+            }
+
+            return minor(Integer.parseInt(requireValidIdentifier(minor)));
         }
 
 
@@ -140,6 +265,20 @@ public class Version {
             setPatch(patch);
 
             return this;
+        }
+
+
+        public Builder patch(final String patch) {
+
+            if (patch == null) {
+                throw new NullPointerException("null patch");
+            }
+
+            if (!IDENTIFIER_PATTERN.matcher(patch).matches()) {
+                throw new IllegalArgumentException("invalid patch: " + patch);
+            }
+
+            return patch(Integer.parseInt(requireValidIdentifier(patch)));
         }
 
 
@@ -224,33 +363,9 @@ public class Version {
     }
 
 
-    public static Builder valueOf(final String s) {
+    public static Version valueOf(final String s) {
 
-        if (s == null) {
-            throw new NullPointerException("null string");
-        }
-
-        final Matcher matcher = PATTERN.matcher(s);
-        if (!matcher.matches()) {
-            throw new IllegalArgumentException("invalid version string: " + s);
-        }
-
-        final Builder builder = new Builder()
-            .major(Integer.parseInt(matcher.group(1)))
-            .minor(Integer.parseInt(matcher.group(2)))
-            .patch(Integer.parseInt(matcher.group(3)));
-
-        final String releaseValue = matcher.group(5);
-        if (releaseValue != null) {
-            builder.release(Release.valueOf(releaseValue));
-        }
-
-        final String metadataValue = matcher.group(7);
-        if (metadataValue != null) {
-            builder.metadata(Metadata.valueOf(metadataValue));
-        }
-
-        return builder;
+        return Builder.valueOf(s).build();
     }
 
 
@@ -258,7 +373,19 @@ public class Version {
 
         super();
 
-        this.value = requireValidValue(value);
+//        this.value = requireValidValue(value);
+        this.value = value;
+    }
+
+
+    @Override
+    public int compareTo(final Version o) {
+
+        if (o == null) {
+            throw new NullPointerException("null o");
+        }
+
+        return Builder.valueOf(value).compareTo(Builder.valueOf(o.value));
     }
 
 

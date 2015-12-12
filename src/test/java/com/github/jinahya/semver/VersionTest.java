@@ -22,6 +22,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.Test;
 
 
@@ -50,9 +51,50 @@ public class VersionTest {
     public static void valueOf() {
 
         for (final String expected : VALIDS) {
-            final String actual = Version.valueOf(expected).build().getValue();
+            final String actual = Version.valueOf(expected).getValue();
             assertEquals(actual, expected);
         }
+    }
+
+
+    @Test
+    public void precedence() {
+
+        final String[] values = {
+            "1.0.0-alpha",
+            "1.0.0-alpha.1",
+            "1.0.0-alpha.beta",
+            "1.0.0-beta",
+            "1.0.0-beta.2",
+            "1.0.0-beta.11",
+            "1.0.0-rc.1",
+            "1.0.0"
+        };
+
+        for (int i = 0; i < values.length; i++) {
+            final Version version = Version.valueOf(values[i]);
+            for (int j = 0; j < i; j++) {
+                assertTrue(version.compareTo(Version.valueOf(values[j])) > 0);
+            }
+            assertTrue(version.compareTo(version) == 0);
+            for (int j = i + 1; j < values.length; j++) {
+                assertTrue(version.compareTo(Version.valueOf(values[j])) < 0);
+            }
+        }
+    }
+
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void leadingZerosInMajorNumber() {
+
+        Version.valueOf("00.0.0");
+    }
+
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void nonNumericInMajorNumber() {
+
+        Version.valueOf("a.0.0");
     }
 
 }
