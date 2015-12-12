@@ -21,30 +21,30 @@ import java.util.Arrays;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static org.testng.Assert.assertEquals;
 import org.testng.annotations.Test;
+import static org.testng.Assert.assertEquals;
 
 
 /**
  *
  * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
  */
-public class ReleaseTest {
+public class BulidMetadataTest {
 
 
     private static final Logger logger
-        = LoggerFactory.getLogger(ReleaseTest.class);
+        = LoggerFactory.getLogger(BulidMetadataTest.class);
 
 
     private static final List<String> VALIDS
-        = Arrays.asList("alpha", "alpha.1", "0.3.7", "x.7.z.92");
+        = Arrays.asList("001", "20130313144700", "exp.sha.5114f85");
 
 
     @Test
-    public void valueOf() {
+    public static void valueOf() {
 
         VALIDS.forEach(expected -> {
-            final String actual = Release.valueOf(expected).getValue();
+            final String actual = BuildMetadata.valueOf(expected).toString();
             assertEquals(actual, expected);
         });
     }
