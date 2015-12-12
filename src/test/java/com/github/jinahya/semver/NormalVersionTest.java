@@ -22,9 +22,9 @@ import java.util.List;
 import static java.util.concurrent.ThreadLocalRandom.current;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
+import org.testng.annotations.Test;
 
 
 /**
@@ -98,32 +98,30 @@ public class NormalVersionTest {
         NormalVersion.valueOf("a.0.0");
     }
 
-
-    @Test
-    public void increaseMajor() {
-
-        final int major = current().nextInt(1024);
-        final NormalVersion version = new NormalVersion.Builder().majorVersion(major).build();
-        assertEquals(version.getMajorVersionIncreased().getMajorVersion(), major + 1);
-    }
-
-
-    @Test
-    public void increaseMinor() {
-
-        final int minor = current().nextInt(1024);
-        final NormalVersion version = new NormalVersion.Builder().minorVersion(minor).build();
-        assertEquals(version.getMinorVersionIncreased().getMinorVersion(), minor + 1);
-    }
-
-
-    @Test
-    public void increasePatch() {
-
-        final int patch = current().nextInt(1024);
-        final NormalVersion version = new NormalVersion.Builder().patchVersion(patch).build();
-        assertEquals(version.getPatchVersionIncreased().getPatchVersion(), patch + 1);
-    }
-
+//    @Test
+//    public void increaseMajor() {
+//
+//        final int major = current().nextInt(1024);
+//        final NormalVersion version = new NormalVersion.Builder().majorVersion(major).build();
+//        assertEquals(version.getMajorVersionIncreased().getMajorVersion(), major + 1);
+//    }
+//
+//
+//    @Test
+//    public void increaseMinor() {
+//
+//        final int minor = current().nextInt(1024);
+//        final NormalVersion version = new NormalVersion.Builder().minorVersion(minor).build();
+//        assertEquals(version.getMinorVersionIncreased().getMinorVersion(), minor + 1);
+//    }
+//
+//
+//    @Test
+//    public void increasePatch() {
+//
+//        final int patch = current().nextInt(1024);
+//        final NormalVersion version = new NormalVersion.Builder().patchVersion(patch).build();
+//        assertEquals(version.getPatchVersionIncreased().getPatchVersion(), patch + 1);
+//    }
 }
 

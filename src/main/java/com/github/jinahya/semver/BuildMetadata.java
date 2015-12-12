@@ -84,6 +84,20 @@ public class BuildMetadata {
         }
 
 
+        public static Builder valueOf(final BuildMetadata built) {
+
+            return new Builder().identifiers(built.getIdentifiers());
+        }
+
+
+        private void identifier(final String identifier) {
+
+            for (final String token : identifier.split("\\.")) {
+                identifiers.add(requireValidIdentifier(token));
+            }
+        }
+
+
         /**
          * Adds identifies.
          *
@@ -95,11 +109,11 @@ public class BuildMetadata {
         public Builder identifiers(final String identifier,
                                    final String... otherIdentifiers) {
 
-            identifiers.add(requireValidIdentifier(identifier));
+            identifier(identifier);
 
             if (otherIdentifiers != null) {
                 for (final String otherIdentifier : otherIdentifiers) {
-                    identifiers.add(requireValidIdentifier(otherIdentifier));
+                    identifier(otherIdentifier);
                 }
             }
 
@@ -117,7 +131,7 @@ public class BuildMetadata {
         public Builder identifiers(final Iterator<String> identifiers) {
 
             while (identifiers.hasNext()) {
-                identifiers(identifiers.next());
+                identifier(identifiers.next());
             }
 
             return this;

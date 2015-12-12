@@ -96,6 +96,20 @@ public class PreReleaseVersion implements Comparable<PreReleaseVersion> {
         }
 
 
+        public static Builder valueOf(final PreReleaseVersion built) {
+
+            return new Builder().identifiers(built.getIdentifiers());
+        }
+
+
+        private void identifier(final String identifier) {
+
+            for (final String token : identifier.split("\\.")) {
+                identifiers.add(requireValidIdentifier(token));
+            }
+        }
+
+
         /**
          * Adds identifiers.
          *
@@ -109,11 +123,11 @@ public class PreReleaseVersion implements Comparable<PreReleaseVersion> {
         public Builder identifiers(final String identifier,
                                    final String... otherIdentifiers) {
 
-            identifiers.add(requireValidIdentifier(identifier));
+            identifier(identifier);
 
             if (otherIdentifiers != null) {
                 for (final String otherIdentifier : otherIdentifiers) {
-                    identifiers.add(requireValidIdentifier(otherIdentifier));
+                    identifier(otherIdentifier);
                 }
             }
 
@@ -124,7 +138,7 @@ public class PreReleaseVersion implements Comparable<PreReleaseVersion> {
         public Builder identifiers(final Iterator<String> identifiers) {
 
             while (identifiers.hasNext()) {
-                identifiers(identifiers.next());
+                identifier(identifiers.next());
             }
 
             return this;

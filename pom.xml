@@ -94,6 +94,10 @@
               <goal>check</goal>
             </goals>
             <configuration>
+              <ignores>
+                <ignore>java.util.function.IntUnaryOperator</ignore>
+                <ignore>java.util.function.UnaryOperator</ignore>
+              </ignores>
               <signature>
                 <groupId>org.codehaus.mojo.signature</groupId>
                 <artifactId>java16</artifactId>
@@ -108,6 +112,10 @@
               <goal>check</goal>
             </goals>
             <configuration>
+              <ignores>
+                <ignore>java.util.function.IntUnaryOperator</ignore>
+                <ignore>java.util.function.UnaryOperator</ignore>
+              </ignores>
               <signature>
                 <groupId>net.sf.androidscents.signature</groupId>
                 <artifactId>android-api-level-16</artifactId>

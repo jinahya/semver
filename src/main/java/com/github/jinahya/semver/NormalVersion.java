@@ -17,6 +17,8 @@
 package com.github.jinahya.semver;
 
 
+import java.util.function.IntUnaryOperator;
+import java.util.function.UnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,7 +87,7 @@ public class NormalVersion implements Comparable<NormalVersion> {
         }
 
 
-        private static Builder valueOf(final NormalVersion o) {
+        public static Builder valueOf(final NormalVersion o) {
 
             return new Builder()
                 .majorVersion(o.getMajorVersion())
@@ -120,12 +122,6 @@ public class NormalVersion implements Comparable<NormalVersion> {
         }
 
 
-        private Builder increaseMajorVersion() {
-
-            return majorVersion(majorVersion + 1);
-        }
-
-
         public Builder majorVersion(final String s) {
 
             return majorVersion(Integer.parseInt(requireValidIdentifier(s)));
@@ -148,7 +144,13 @@ public class NormalVersion implements Comparable<NormalVersion> {
         }
 
 
-        private Builder increaseMinorVersion() {
+        public Builder minorVersion(final IntUnaryOperator operator) {
+
+            return minorVersion(operator.applyAsInt(minorVersion));
+        }
+
+
+        public Builder increaseMinorVersion() {
 
             return minorVersion(minorVersion + 1);
         }
@@ -172,7 +174,13 @@ public class NormalVersion implements Comparable<NormalVersion> {
         }
 
 
-        private Builder increasePatchVersion() {
+        public Builder patchVersion(final IntUnaryOperator operator) {
+
+            return patchVersion(operator.applyAsInt(patchVersion));
+        }
+
+
+        public Builder increasePatchVersion() {
 
             return patchVersion(patchVersion + 1);
         }
@@ -189,6 +197,13 @@ public class NormalVersion implements Comparable<NormalVersion> {
             this.preReleaseVersion = v;
 
             return this;
+        }
+
+
+        public Builder preReleaseVersion(
+            final UnaryOperator<PreReleaseVersion> operator) {
+
+            return preReeleaseVersion(operator.apply(preReleaseVersion));
         }
 
 
@@ -209,6 +224,13 @@ public class NormalVersion implements Comparable<NormalVersion> {
             this.buildMetadata = v;
 
             return this;
+        }
+
+
+        public Builder buildMetadata(
+            final UnaryOperator<BuildMetadata> operator) {
+
+            return buildMetadata(operator.apply(buildMetadata));
         }
 
 
@@ -338,6 +360,12 @@ public class NormalVersion implements Comparable<NormalVersion> {
     }
 
 
+    public NormalVersion getMajorVersionSet(final int value) {
+
+        return Builder.valueOf(this).majorVersion(value).build();
+    }
+
+
     /**
      * Returns a new instance with major version increased.
      *
@@ -345,7 +373,13 @@ public class NormalVersion implements Comparable<NormalVersion> {
      */
     public NormalVersion getMajorVersionIncreased() {
 
-        return Builder.valueOf(this).increaseMajorVersion().build();
+        return getMajorVersionSet(majorVersion + 1);
+    }
+
+
+    public NormalVersion getMajorVersionSet(final IntUnaryOperator operator) {
+
+        return getMajorVersionSet(operator.applyAsInt(majorVersion));
     }
 
 
@@ -360,6 +394,12 @@ public class NormalVersion implements Comparable<NormalVersion> {
     }
 
 
+    public NormalVersion getMinorVersionSet(final int value) {
+
+        return Builder.valueOf(this).minorVersion(value).build();
+    }
+
+
     /**
      * Returns a new instance with minor version increased.
      *
@@ -367,7 +407,13 @@ public class NormalVersion implements Comparable<NormalVersion> {
      */
     public NormalVersion getMinorVersionIncreased() {
 
-        return Builder.valueOf(this).increaseMinorVersion().build();
+        return getMinorVersionSet(minorVersion + 1);
+    }
+
+
+    public NormalVersion getMinorVersoinSet(final IntUnaryOperator operator) {
+
+        return getMinorVersionSet(operator.applyAsInt(minorVersion));
     }
 
 
@@ -382,6 +428,12 @@ public class NormalVersion implements Comparable<NormalVersion> {
     }
 
 
+    public NormalVersion getPatchVersionSet(final int value) {
+
+        return Builder.valueOf(this).patchVersion(value).build();
+    }
+
+
     /**
      * Returns a new instance with patch version increased.
      *
@@ -389,7 +441,13 @@ public class NormalVersion implements Comparable<NormalVersion> {
      */
     public NormalVersion getPatchVersionIncreased() {
 
-        return Builder.valueOf(this).increasePatchVersion().build();
+        return getPatchVersionSet(patchVersion + 1);
+    }
+
+
+    public NormalVersion getPatchVersoinSet(final IntUnaryOperator operator) {
+
+        return getPatchVersionSet(operator.applyAsInt(patchVersion));
     }
 
 
@@ -404,6 +462,20 @@ public class NormalVersion implements Comparable<NormalVersion> {
     }
 
 
+    public NormalVersion getPreReleaseVersionSet(
+        final PreReleaseVersion value) {
+
+        return Builder.valueOf(this).preReeleaseVersion(value).build();
+    }
+
+
+    public NormalVersion getPreReleaseVersionSet(
+        final UnaryOperator<PreReleaseVersion> operator) {
+
+        return getPreReleaseVersionSet(operator.apply(preReleaseVersion));
+    }
+
+
     /**
      * Returns build metadata.
      *
@@ -412,6 +484,19 @@ public class NormalVersion implements Comparable<NormalVersion> {
     public BuildMetadata getBuildMetadata() {
 
         return buildMetadata;
+    }
+
+
+    public NormalVersion getBuildMetadataSet(final BuildMetadata value) {
+
+        return Builder.valueOf(this).buildMetadata(value).build();
+    }
+
+
+    public NormalVersion getBuildeMetadataSet(
+        final UnaryOperator<BuildMetadata> operator) {
+
+        return getBuildMetadataSet(operator.apply(buildMetadata));
     }
 
 
