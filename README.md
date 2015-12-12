@@ -1,4 +1,5 @@
 # semver
+[![GitHub license](https://img.shields.io/github/license/jinahya/semver.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Dependency Status](https://www.versioneye.com/user/projects/5669f12843cfea00310001c6/badge.svg)](https://www.versioneye.com/user/projects/5669f12843cfea00310001c6)
 [![Build Status](https://travis-ci.org/jinahya/semver.svg)](https://travis-ci.org/jinahya/semver)
 [![Maven Central](https://img.shields.io/maven-central/v/com.github.jinahya/semver.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.github.jinahya%22%20a%3A%22semver%22)
@@ -8,6 +9,7 @@ A small library implementing [Semantic Versioning](http://semver.org).
 ## Versions
 |Version|Site|Apidocs|Notes|
 |-------|----|-------|-----|
+|0.2.0-SNAPSHOT|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.2.0-SNAPSHOT/index.html)|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.2.0-SNAPSHOT/apidocs/index.html)||
 |0.1.0|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.0.1/index.html)|[jinahya.github.io](http://jinahya.github.io/semver/sites/0.0.1/apidocs/index.html)||
 
 ## Usages
