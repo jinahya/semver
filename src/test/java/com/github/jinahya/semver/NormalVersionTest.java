@@ -19,22 +19,23 @@ package com.github.jinahya.semver;
 
 import java.util.Arrays;
 import java.util.List;
+import static java.util.concurrent.ThreadLocalRandom.current;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
-import org.testng.annotations.Test;
 
 
 /**
  *
  * @author Jin Kwon &lt;jinahya_at_gmail.com&gt;
  */
-public class VersionTest {
+public class NormalVersionTest {
 
 
     private static final Logger logger
-        = LoggerFactory.getLogger(VersionTest.class);
+        = LoggerFactory.getLogger(NormalVersionTest.class);
 
 
     private static List<String> VALIDS = Arrays.asList(
@@ -51,7 +52,7 @@ public class VersionTest {
     public static void valueOf() {
 
         for (final String expected : VALIDS) {
-            final String actual = Version.valueOf(expected).getValue();
+            final String actual = NormalVersion.valueOf(expected).toString();
             assertEquals(actual, expected);
         }
     }
@@ -72,13 +73,13 @@ public class VersionTest {
         };
 
         for (int i = 0; i < values.length; i++) {
-            final Version version = Version.valueOf(values[i]);
+            final NormalVersion version = NormalVersion.valueOf(values[i]);
             for (int j = 0; j < i; j++) {
-                assertTrue(version.compareTo(Version.valueOf(values[j])) > 0);
+                assertTrue(version.compareTo(NormalVersion.valueOf(values[j])) > 0);
             }
             assertTrue(version.compareTo(version) == 0);
             for (int j = i + 1; j < values.length; j++) {
-                assertTrue(version.compareTo(Version.valueOf(values[j])) < 0);
+                assertTrue(version.compareTo(NormalVersion.valueOf(values[j])) < 0);
             }
         }
     }
@@ -87,14 +88,41 @@ public class VersionTest {
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void leadingZerosInMajorNumber() {
 
-        Version.valueOf("00.0.0");
+        NormalVersion.valueOf("00.0.0");
     }
 
 
     @Test(expectedExceptions = IllegalArgumentException.class)
     public void nonNumericInMajorNumber() {
 
-        Version.valueOf("a.0.0");
+        NormalVersion.valueOf("a.0.0");
+    }
+
+
+    @Test
+    public void increaseMajor() {
+
+        final int major = current().nextInt(1024);
+        final NormalVersion version = new NormalVersion.Builder().majorVersion(major).build();
+        assertEquals(version.getMajorVersionIncreased().getMajorVersion(), major + 1);
+    }
+
+
+    @Test
+    public void increaseMinor() {
+
+        final int minor = current().nextInt(1024);
+        final NormalVersion version = new NormalVersion.Builder().minorVersion(minor).build();
+        assertEquals(version.getMinorVersionIncreased().getMinorVersion(), minor + 1);
+    }
+
+
+    @Test
+    public void increasePatch() {
+
+        final int patch = current().nextInt(1024);
+        final NormalVersion version = new NormalVersion.Builder().patchVersion(patch).build();
+        assertEquals(version.getPatchVersionIncreased().getPatchVersion(), patch + 1);
     }
 
 }
